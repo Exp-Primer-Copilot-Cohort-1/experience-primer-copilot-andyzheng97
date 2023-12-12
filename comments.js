@@ -71,4 +71,24 @@ app.post('/addComment', jsonParser, function (req, res) {
 });
 
 // Delete comment
-app.post('/deleteComment', jsonParser, function (req, res)
+app.post('/deleteComment', jsonParser, function (req, res) {
+    var id = req.body.id;
+
+    var sql = "DELETE FROM comments WHERE id = " + id;
+    connection.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log("1 record deleted");
+    });
+
+    fs.readFile(__dirname + "/" + "comments.json", 'utf8', function (err, data) {
+        if (err) throw err;
+
+        var comments = JSON.parse(data);
+        comments.splice(id, 1);
+
+        fs.writeFile(__dirname + "/" + "comments.json", JSON.stringify(comments), function (err) {
+            if (err) throw err;
+            res.end(JSON.stringify(comments));
+        });
+    });
+})
